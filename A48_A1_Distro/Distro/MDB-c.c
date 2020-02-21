@@ -87,7 +87,8 @@
 // Used to store information about the cast of a movie (Implement AFTER everything else)
 typedef struct castList_struct
 {
-        
+    char *actor;
+    char *next;
 } CastList;
 
 // Used to store information about a movie
@@ -96,19 +97,20 @@ typedef struct movieReview_struct
 
   // IMPLEMENT THIS FIRST - else the code won't compile
 
-	char movie_title[MAX_STR_LEN];
-	char movie_studio[MAX_STR_LEN];
+	char *movie_title;
+	char *movie_studio;
 	int year;
 	double BO_total;
 	int score;
-	CastList cast;
+	CastList *cast;
     
 } MovieReview;
 
 // Used to store a linked list of MovieReview nodes
 typedef struct reviewNode_struct
 {
-
+    MovieReview review;
+    MovieReview *next;
   // IMPLEMENT THIS FIRST - else your code won't compile
     
 } ReviewNode;
@@ -144,7 +146,24 @@ ReviewNode *newMovieReviewNode(char *title, char *studio, int year, double BO_to
     /**********  TODO: Complete this function *********************************/
     /***************************************************************************/
 
-    return NULL;  // Remove this before you implement your solution!
+    ReviewNode *new_node = NULL;
+    new_node = (ReviewNode *)calloc(1, sizeOf(reviewNode_struct));
+
+    if (new_node == NULL)
+    {
+        return NULL;
+    }
+
+    new_node -> review.movie_title = title;
+    new_node -> review.movie_studio = studio;
+    new_node -> review.year = year;
+    new_node -> review.BO_total = BO_total;
+    new_node -> review.score = score; 
+    new_node -> next = NULL;
+    
+    free(new_node);
+
+    return new_node;  // Remove this before you implement your solution!
 }
 
 /**

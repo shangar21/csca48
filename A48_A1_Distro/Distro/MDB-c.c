@@ -160,8 +160,6 @@ ReviewNode *newMovieReviewNode(char *title, char *studio, int year, double BO_to
     new_node -> review.BO_total = BO_total;
     new_node -> review.score = score; 
     new_node -> next = NULL;
-    
-    free(new_node);
 
     return new_node;  // Remove this before you implement your solution!
 }
@@ -189,6 +187,18 @@ ReviewNode *findMovieReview(char *title, char *studio, int year, ReviewNode *hea
     /***************************************************************************/
     /**********  TODO: Complete this function *********************************/
     /***************************************************************************/
+
+    ReviewNode temp = head;
+
+    while (temp -> next != NULL)
+    {
+        if (strcmp(temp -> review.title, title) == 0 && strcmp(temp -> review.studio, studio) == 0 && temp -> review.year == year)
+        {
+            return temp;
+        }
+
+        temp = temp.next;
+    }
 
     return NULL;  // Remove this before you implement your solution!
 }
@@ -220,8 +230,18 @@ ReviewNode *insertMovieReview(char *title, char *studio, int year, double BO_tot
     /***************************************************************************/
     /**********  TODO: Complete this function **********************************/
     /***************************************************************************/
+    ReviewNode new_movie = head;
 
-    return NULL;  // Remove this before you implement your solution!
+    if (findMovieReview(title, studio, year, head) == NULL)
+    {
+        return head;
+    }
+
+    new_movie = newMovieReviewNode(title, studio, year, BO_total, score);
+    new_movie.next = head;
+
+
+    return new_movie;  // Remove this before you implement your solution!
 }
 
 /**
@@ -237,7 +257,16 @@ int countReviews(ReviewNode *head)
     /**********  TODO: Complete this function **********************************/
     /***************************************************************************/
 
-    return 0;  // Remove this before you implement your solution
+    int counter = 0;
+
+    while (temp -> next != NULL)
+    {
+        counter++;
+        temp = temp.next;
+    }
+
+
+    return counter;  // Remove this before you implement your solution
 }
 
 /**
@@ -267,6 +296,20 @@ void updateMovieReview(char *title, char *studio, int year, double BO_total, int
     /**********  TODO: Complete this function *********************************/
     /***************************************************************************/
 
+    reviewNode movie = findMovieReview(title, studio, year);
+
+    if(movie != NULL)
+    {
+        movie -> review.score == score;
+        movie -> review.BO_total == BO_total;
+    }
+    else
+    {
+        printf("Error 404: Movie not found :(")
+    }
+    
+    
+
 }
 
 /**
@@ -285,8 +328,24 @@ ReviewNode *deleteMovieReview(char *title, char *studio, int year, ReviewNode *h
     /***************************************************************************/
     /**********  TODO: Complete this function *********************************/
     /***************************************************************************/
+    ReviewNode want_to_find = findMovieReview(title, studio, year);
+    ReviewNode temp = head;
 
-    return NULL;  // Remove this before implementing your solution
+    if(want_to_find == NULL)
+    {
+        return head;
+    }
+
+    while(temp.next != want_to_find)
+    {
+        temp = temp.next;
+    }
+
+    temp.next = want_to_find.next;
+
+    free(want_to_find);
+
+    return head;  // Remove this before implementing your solution
 }
 
 /**
@@ -310,7 +369,16 @@ double printMovieReviews(ReviewNode *head)
     /**********  TODO: Complete this function *********************************/
     /***************************************************************************/
 
-    return 0;  // Remove this before you implement your solution
+    ReviewNode temp = head;
+    float bo_running_total = 0.0;
+
+    while(temp.next != NULL)
+    {
+        printf("%s\n%s\n%d\n%d\n%f\n*********************************************\n", temp -> review.title, temp -> review.studio, temp -> review.year, temp -> review.score, temp -> review.BO_total);
+        bo_running_total += temp -> review.BO_total;
+    }
+
+    return bo_running_total;  // Remove this before you implement your solution
 }
 
 /**
@@ -336,7 +404,19 @@ double queryReviewsByStudio(char *studio, ReviewNode *head)
     /**********  TODO: Complete this function *********************************/
     /***************************************************************************/
 
-    return 0;  // Remove this before you implement your solution
+    ReviewNode temp = head;
+    float bo_running_total = 0.0;
+
+    while(temp.next != head)
+    {
+        if(strcmp(temp -> review.studio, studio) == 0)
+        {
+            printf("%s\n%s\n%d\n%d\n%f\n*********************************************\n", temp -> review.title, temp -> review.studio, temp -> review.year, temp -> review.score, temp -> review.BO_total);
+            bo_running_total += temp -> review.BO_total;
+        }
+    }
+
+    return bo_running_total;  // Remove this before you implement your solution
 }
 
 /**
@@ -360,8 +440,19 @@ double queryReviewsByScore(int min_score, ReviewNode *head)
     /***************************************************************************/
     /**********  TODO: Complete this function *********************************/
     /***************************************************************************/
+    ReviewNode temp = head;
+    float bo_running_total = 0.0;
 
-    return 0;  // Remove this before you implement your solution
+    while(temp.next != head)
+    {
+        if(temp -> review.score == score)
+        {
+            printf("%s\n%s\n%d\n%d\n%f\n*********************************************\n", temp -> review.title, temp -> review.studio, temp -> review.year, temp -> review.score, temp -> review.BO_total);
+            bo_running_total += temp -> review.BO_total;
+        }
+    }
+
+    return bo_running_total;
 }
 
 /**

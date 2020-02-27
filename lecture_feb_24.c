@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+#define n = 1024
+
 /*
 How good are Linked-Lists (lnln):
 	when do we use them?
@@ -39,10 +41,8 @@ Big O notation complexity:
 			Worst case O(log_2(N)) 
 				because we are going by half each time
 
- 
-		
-
-	
+Previously on A48
+	the truth is revealed
 
 
 
@@ -54,3 +54,28 @@ int main()
 
 }
 
+/*
+
+O(N^2 + 2N) run time
+
+*/
+
+void multiply_accumulate(float input[n], float output[n])
+{
+	for(int i = 0; i < n; i++)
+	{
+		output[i] = 0;
+		for(int j = 0; j < n; j++)
+		{
+			output[i] = output[i] + input[i]*input[j];
+		}
+	}
+}
+
+typedef struct binary_int_tree_struct
+{
+	int num;
+	struct binary_int_tree_struct  *left;
+	struct binary_int_tree_struct  *right;
+
+}binary_int;

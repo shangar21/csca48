@@ -41,7 +41,7 @@ typedef enum adt
 // statements. We need the functions' signatures and the global variable names UNCHANGED.
 //////////////////////////////////////////////////////////////////////////////////////////
 
-const ADT CORRECT_ADT = PICK_ONE; /** PICK: STACK or QUEUE */
+const ADT CORRECT_ADT = QUEUE; /** PICK: STACK or QUEUE */
 
 /**
  * Adds name to the end of the Queue.
@@ -55,21 +55,32 @@ const ADT CORRECT_ADT = PICK_ONE; /** PICK: STACK or QUEUE */
  */
 bool enqueue(Data *data, char *name)
 {
-    // TODO in O(1) time
+    // TODO in O(1) time   
+
     struct ticket *src = (struct ticket *)calloc(1, sizeof(struct ticket));
 
-    if(src != NULL)
+
+    if(src != NULL && data != NULL)
     {
+        strcpy(src -> name, name);
         src -> next = NULL;
 
-        if(data -> first == NULL)
-        {            
-            data -> first == src;
+        if (data -> first == NULL)
+        {
+            data -> first = src;
+        }
+        else if (data -> last == NULL)
+        {
+            data -> first -> next = src;
+            data -> last = src;
+        }
+        else
+        {
+            data -> last -> next = src;
+            data -> last = src;
         }
 
-        data -> last -> next = src;
-
-        data -> last = src;
+        return true;
     }
 
 
@@ -90,11 +101,13 @@ bool dequeue(Data *data, char *returned_name)
 {
     // TODO in O(1) time
 
+
     if(data != NULL && returned_name != NULL)
     {
         struct ticket *temp = data -> first -> next;
         free(data -> first);
         data -> first = temp;
+        return true;
 
     }
 
@@ -117,15 +130,16 @@ bool push(Data *data, char *name)
 
     struct ticket *src = (struct ticket *)calloc(1, sizeof(struct ticket));
 
-    if(src != NULL)
+    if(src != NULL && data != NULL)
     {
         data -> first -> next = data -> last;
         data -> last = data -> first;
         data -> first = src;
         src = NULL;
+        return true;
     }
 
-    return fasle;
+    return false;
 
 }
 
@@ -140,12 +154,13 @@ bool push(Data *data, char *name)
  */
 bool pop(Data *data, char *returned_name)
 {
-    if(returned_name != NULL and data != NULL)
+    if(returned_name != NULL && data != NULL)
     {
         struct ticket *temp = data -> last -> next;
         free(data -> first);
-        data -> first = data -> next;
-        data -> next = temp;
+        data -> first = data -> last;
+        data -> last = temp;
+        return true;
 
 
     }
@@ -210,7 +225,9 @@ void sleep(double length)
 #define NUM_NAMES (8)
 int main()
 {
+
     // You can play around with this code if you want:
+
     const char NAMES[NUM_NAMES][MAX_NAME_LENGTH] = {
         "Austen", "Bronte", "Carol", "Dickens", "Eliot", "Fyodor", "Gaskell", "Hardy",
     };                            // It doesn't matter if you change these strings, so have fun.
@@ -224,12 +241,18 @@ int main()
     Data data = {NULL, NULL};
     int i, n;
 
+
     // Truly random numbers don't get made by computers. They're not good at it.
     srand(SEED);  // Changing SEED helps make this "random"ish.
 
     // Backlog of waiting customers before Brian
     for (n = 0, i = rand() % NUM_NAMES; n < NUM_CUSTOMERS; n++, i = rand() % NUM_NAMES)
         takeTicket(&data, (char *)NAMES[i]);
+
+    //printf("%c, %c\n", data.first -> name[0], data.last -> name[0] );
+
+
+
 
     takeTicket(&data, "Brian");  // Brian takes a ticket
 

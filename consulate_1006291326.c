@@ -43,6 +43,7 @@ typedef enum adt
 
 const ADT CORRECT_ADT = QUEUE; /** PICK: STACK or QUEUE */
 
+
 /**
  * Adds name to the end of the Queue.
  *
@@ -56,36 +57,36 @@ const ADT CORRECT_ADT = QUEUE; /** PICK: STACK or QUEUE */
 bool enqueue(Data *data, char *name)
 {
     // TODO in O(1) time   
-
     struct ticket *src = (struct ticket *)calloc(1, sizeof(struct ticket));
 
-
-    if(src != NULL && data != NULL)
+    if(src == NULL || data == NULL || name == NULL)
     {
-        strcpy(src -> name, name);
-        src -> next = NULL;
 
-        if (data -> first == NULL)
-        {
-            data -> first = src;
-        }
-        else if (data -> last == NULL)
-        {
-            data -> first -> next = src;
-            data -> last = src;
-        }
-        else
-        {
-            data -> last -> next = src;
-            data -> last = src;
-        }
+        return false;
+    }
 
-        return true;
+    strcpy(src -> name, name);
+    src -> next = NULL;
+
+    if(data -> first == NULL)
+    {
+        data -> first = src;
+    }
+    else if(data -> last == NULL)
+    {
+        data -> first -> next = src;
+        data -> last = src; 
+    }
+    else
+    {
+        struct ticket *temp = data -> last;
+        temp -> next = src;
+        data -> last = src;
+
     }
 
 
-
-    return false;
+    return true;
 }
 
 /**
@@ -101,17 +102,22 @@ bool dequeue(Data *data, char *returned_name)
 {
     // TODO in O(1) time
 
-
-    if(data != NULL && returned_name != NULL)
+    if(data == NULL || returned_name == NULL)
     {
-        struct ticket *temp = data -> first -> next;
-        free(data -> first);
-        data -> first = temp;
-        return true;
-
+        return false;
     }
 
-    return false;
+    if(data -> last == NULL)
+    {
+        free(data -> first);
+    }
+
+    struct ticket *temp = data -> first -> next;
+    struct ticket *must_free = data -> first;
+    data -> first = temp;
+    free(must_free);
+
+    return true;
 }
 
 /**
@@ -128,17 +134,6 @@ bool push(Data *data, char *name)
 {
     // TODO in O(1) time
 
-    struct ticket *src = (struct ticket *)calloc(1, sizeof(struct ticket));
-
-    if(src != NULL && data != NULL)
-    {
-        data -> first -> next = data -> last;
-        data -> last = data -> first;
-        data -> first = src;
-        src = NULL;
-        return true;
-    }
-
     return false;
 
 }
@@ -154,16 +149,6 @@ bool push(Data *data, char *name)
  */
 bool pop(Data *data, char *returned_name)
 {
-    if(returned_name != NULL && data != NULL)
-    {
-        struct ticket *temp = data -> last -> next;
-        free(data -> first);
-        data -> first = data -> last;
-        data -> last = temp;
-        return true;
-
-
-    }
 
     return false;
 
@@ -231,9 +216,9 @@ int main()
     const char NAMES[NUM_NAMES][MAX_NAME_LENGTH] = {
         "Austen", "Bronte", "Carol", "Dickens", "Eliot", "Fyodor", "Gaskell", "Hardy",
     };                            // It doesn't matter if you change these strings, so have fun.
-    const int NUM_CUSTOMERS = 3;  // Change this to integers between 2 and NUM_NAMES to test.
-    const double RATE = 0.75;     // Change this to rationals between 0.1 and 0.9 to test.
-    const double SEED = 3.14519;  // Change this to rationals between 2 and 5 to test.
+    const int NUM_CUSTOMERS = 5;  // Change this to integers between 2 and NUM_NAMES to test.
+    const double RATE = 0.88;     // Change this to rationals between 0.1 and 0.9 to test.
+    const double SEED = 5;  // Change this to rationals between 2 and 5 to test.
 
     double likelihood_of_new_customer = SEED;
     char name[MAX_NAME_LENGTH];
@@ -249,12 +234,10 @@ int main()
     for (n = 0, i = rand() % NUM_NAMES; n < NUM_CUSTOMERS; n++, i = rand() % NUM_NAMES)
         takeTicket(&data, (char *)NAMES[i]);
 
-    //printf("%c, %c\n", data.first -> name[0], data.last -> name[0] );
-
-
 
 
     takeTicket(&data, "Brian");  // Brian takes a ticket
+
 
     // Backlog of waiting customers after Brian
     for (n = 0, i = rand() % NUM_NAMES; n < NUM_CUSTOMERS; n++, i = rand() % NUM_NAMES)
@@ -274,13 +257,13 @@ int main()
         }
 
         // Process the next ticket
-        callTicket(&data, name);
-        printf("Consulate now serving ticket for customer named: %s\n", name);
+        callTicket(&data, data.first -> name);
+        printf("Consulate now serving ticket for customer named: %s\n", data.first -> name );
 
         // make it less likely that another name will be added next loop
         likelihood_of_new_customer *= RATE;
 
-    } while (0 != strncmp(name, "Brian", MAX_NAME_LENGTH));
+    } while (0 != strncmp(data.first -> name, "Brian", MAX_NAME_LENGTH));
 
     end = time(NULL);
     printf("Hooray, Brian has his passport.\n");

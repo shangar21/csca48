@@ -188,6 +188,7 @@ ReviewNode *findMovieReview(char *title, char *studio, int year, ReviewNode *hea
     /**********  TODO: Complete this function *********************************/
     /***************************************************************************/
 
+<<<<<<< HEAD
     ReviewNode temp = head;
 
     while (temp -> next != NULL)
@@ -199,6 +200,9 @@ ReviewNode *findMovieReview(char *title, char *studio, int year, ReviewNode *hea
 
         temp = temp.next;
     }
+=======
+    
+>>>>>>> 57b142f41d32a0906db569264779393d0b46e7a8
 
     return NULL;  // Remove this before you implement your solution!
 }

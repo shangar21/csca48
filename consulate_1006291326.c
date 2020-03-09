@@ -59,7 +59,7 @@ bool enqueue(Data *data, char *name)
     // TODO in O(1) time   
     struct ticket *src = (struct ticket *)calloc(1, sizeof(struct ticket));
 
-    if(src == NULL || data == NULL || name == NULL)
+    if(src == NULL || data == NULL)
     {
 
         return false;
@@ -68,25 +68,29 @@ bool enqueue(Data *data, char *name)
     strcpy(src -> name, name);
     src -> next = NULL;
 
-    if(data -> first == NULL)
+	if(data -> last == NULL)
     {
         data -> first = src;
-    }
-    else if(data -> last == NULL)
-    {
-        data -> first -> next = src;
-        data -> last = src; 
-    }
-    else
-    {
-        struct ticket *temp = data -> last;
-        temp -> next = src;
         data -> last = src;
-
+        return true; 
     }
+
+    data -> last -> next = src;
+    data -> last = src;
 
 
     return true;
+}
+
+void print_queue(Data *data)
+{
+	struct ticket *temp = data -> first;
+
+	while(temp != NULL)
+	{
+		printf("%s\n", temp -> name);
+		temp = temp -> next;
+	}
 }
 
 /**
@@ -102,21 +106,15 @@ bool dequeue(Data *data, char *returned_name)
 {
     // TODO in O(1) time
 
-    if(data == NULL || returned_name == NULL)
+    if(data == NULL || data -> first == NULL)
     {
         return false;
     }
 
-    if(data -> last == NULL)
-    {
-        free(data -> first);
-    }
-
-    struct ticket *temp = data -> first -> next;
     struct ticket *must_free = data -> first;
-    data -> first = temp;
+    data -> first = data -> first -> next;
+    strcpy(returned_name, must_free-> name);
     free(must_free);
-
     return true;
 }
 
@@ -133,9 +131,19 @@ bool dequeue(Data *data, char *returned_name)
 bool push(Data *data, char *name)
 {
     // TODO in O(1) time
+	struct ticket *src = (struct ticket*)calloc(1, sizeof(struct ticket));
 
-    return false;
+	if(src == NULL || data == NULL)
+	{
+		return false;
+	}
 
+	strcpy(src -> name, name);
+
+	src -> next = data -> first;
+	data -> first = src;
+
+	return true;
 }
 
 /**
@@ -150,7 +158,15 @@ bool push(Data *data, char *name)
 bool pop(Data *data, char *returned_name)
 {
 
-    return false;
+	if(data == NULL)
+    {
+        return false;
+    }
+
+    strcpy(returned_name, data -> first-> name);
+    data -> first = data -> first -> next; 
+
+    return true;
 
 }
 
@@ -210,22 +226,19 @@ void sleep(double length)
 #define NUM_NAMES (8)
 int main()
 {
-
     // You can play around with this code if you want:
-
     const char NAMES[NUM_NAMES][MAX_NAME_LENGTH] = {
         "Austen", "Bronte", "Carol", "Dickens", "Eliot", "Fyodor", "Gaskell", "Hardy",
     };                            // It doesn't matter if you change these strings, so have fun.
-    const int NUM_CUSTOMERS = 5;  // Change this to integers between 2 and NUM_NAMES to test.
-    const double RATE = 0.88;     // Change this to rationals between 0.1 and 0.9 to test.
-    const double SEED = 5;  // Change this to rationals between 2 and 5 to test.
+    const int NUM_CUSTOMERS = 3;  // Change this to integers between 2 and NUM_NAMES to test.
+    const double RATE = 0.75;     // Change this to rationals between 0.1 and 0.9 to test.
+    const double SEED = 3.14519;  // Change this to rationals between 2 and 5 to test.
 
     double likelihood_of_new_customer = SEED;
     char name[MAX_NAME_LENGTH];
     time_t start, end;
     Data data = {NULL, NULL};
     int i, n;
-
 
     // Truly random numbers don't get made by computers. They're not good at it.
     srand(SEED);  // Changing SEED helps make this "random"ish.
@@ -234,10 +247,7 @@ int main()
     for (n = 0, i = rand() % NUM_NAMES; n < NUM_CUSTOMERS; n++, i = rand() % NUM_NAMES)
         takeTicket(&data, (char *)NAMES[i]);
 
-
-
     takeTicket(&data, "Brian");  // Brian takes a ticket
-
 
     // Backlog of waiting customers after Brian
     for (n = 0, i = rand() % NUM_NAMES; n < NUM_CUSTOMERS; n++, i = rand() % NUM_NAMES)
@@ -257,13 +267,13 @@ int main()
         }
 
         // Process the next ticket
-        callTicket(&data, data.first -> name);
-        printf("Consulate now serving ticket for customer named: %s\n", data.first -> name );
+        callTicket(&data, name);
+        printf("Consulate now serving ticket for customer named: %s\n", name);
 
         // make it less likely that another name will be added next loop
         likelihood_of_new_customer *= RATE;
 
-    } while (0 != strncmp(data.first -> name, "Brian", MAX_NAME_LENGTH));
+    } while (0 != strncmp(name, "Brian", MAX_NAME_LENGTH));
 
     end = time(NULL);
     printf("Hooray, Brian has his passport.\n");

@@ -70,6 +70,9 @@ typedef struct BST_Node_Struct
     /*** TO DO:
      * Complete the definition of the BST_Node_Struct
      ***/
+
+    struct BST_Node_Struct *left;
+    struct BST_Node_Struct *right;
   
 } BST_Node;
 
@@ -90,8 +93,17 @@ BST_Node *newBST_Node(double freq, int bar, double index)
      * initial values for the data in the BST_Node that can
      * never occur in an actual musical note from a score!
      ****/
+
+    BST_Node *new_node = NULL;
+    new_node = (BST_Node *)calloc(1, sizeof(BST_Node));
+
+    new_node -> freq = freq;
+    new_node -> bar = bar;
+    new_node -> index = index;
+    new_node -> left = NULL;
+    new_node -> right = NULL;
         
-    return NULL;
+    return new_node;
 }
 
 BST_Node *BST_insert(BST_Node *root, BST_Node *new_node)
@@ -117,7 +129,21 @@ BST_Node *BST_insert(BST_Node *root, BST_Node *new_node)
      * Implement the insert function so we can add notes to the tree!
      ****/
 
-    return NULL;
+    if(root == NULL)
+    {
+        return new_node
+    }
+
+    if(new_node -> key <= root)
+    {
+        root -> left = BST_insert(root -> left, new_node);
+    }
+    else
+    {
+        root -> right = BST_insert(root -> right, new_node);
+    }
+
+    return root;
 }
 
 BST_Node *BST_search(BST_Node *root, int bar, double index)
@@ -136,7 +162,27 @@ BST_Node *BST_search(BST_Node *root, int bar, double index)
      * Implement this function
      ****/
 
-    return NULL;
+    if(root == NULL)
+    {
+        return NULL;
+    }
+
+    //fabs((root -> key - ((10 * bar) + index))/root -> key)
+
+    if(root -> key == ((10 * bar) + index))
+    {
+        return root;
+    }
+
+    if(root -> key <= ((10 * bar) + index))
+    {
+        return BST_search(root -> left, name);
+    }
+    else
+    {
+        return BST_search(root -> right, name)
+    }
+
 }
 
 BST_Node *find_successor(BST_Node *right_child_node)
@@ -151,8 +197,15 @@ BST_Node *find_successor(BST_Node *right_child_node)
     /*** TO DO:
      * Implement this function
      ****/
+    
 
-    return NULL;
+    if(right_child_node -> left == NULL)
+    {
+        return right_child_node;    
+    }
+
+    return find_successor(right_child_node -> left); 
+    
     
 }
 
@@ -169,7 +222,49 @@ BST_Node *BST_delete(BST_Node *root, int bar, double index)
     /*** TO DO:
      * Implement this function
      ****/
-    
+
+    BST_Node *tmp;
+
+    if(root == NULL) return NULL;
+
+    if(root -> key == (10 * bar) + index)
+    {
+        if(root -> left == NULL && root -> right == NULL)
+        {
+            free(root);
+            return NULL;
+
+        }
+        else if(root -> right == NULL)
+        {
+            tmp = root -> left;
+            free(root);
+            return temp;
+        }
+        else if(root -> left == NULL)
+        {
+            temp = root -> right;
+            free(root);
+            return tmp;
+        }
+        else
+        {
+            return root;
+        }
+    }
+
+    if(root -> key <= ((10 * bar) + index))
+    {
+        root -> left = BST_delete(root -> left, bar, index);
+    }
+    else
+    {
+        root -> right = BST_delete(root -> right, bar, index);
+    }
+
+
+
+
     return NULL;
 }
 
@@ -226,6 +321,14 @@ void BST_inOrder(BST_Node *root, int depth)
      * Implement this function
      ****/
 
+
+    if(root == NULL) return;
+
+    BST_inOrder(root -> left);
+    depth++;
+    printf("depth=%d, Bar:Index (%d:%f), F=%f" = depth, root -> bar, root -> index, root -> freq);
+    BST_inOrder(root -> right);
+
 } 
 
 void BST_preOrder(BST_Node *root, int depth)
@@ -250,6 +353,18 @@ void BST_preOrder(BST_Node *root, int depth)
     /*** TO DO:
      * Implement this function
      ****/
+    if(root == NULL)
+    {
+        return;
+    }
+    depth++;
+    printf("depth=%d, Bar:Index (%d:%f), F=%f" = depth, root -> bar, root -> index, root -> freq);
+    BST_preOrder(root -> left);
+    BST_preOrder(root -> right);
+
+
+
+
 
 }
 
@@ -276,6 +391,13 @@ void BST_postOrder(BST_Node *root,int depth)
      * Implement this function
      ****/
 
+    if(root == NULL) return;
+
+    BST_postOrder(root -> left);
+    BST_postOrder(root -> right);
+    depth++;
+    printf("depth=%d, Bar:Index (%d:%f), F=%f" = depth, root -> bar, root -> index, root -> freq);
+
 } 
 
 void delete_BST(BST_Node *root)
@@ -290,6 +412,11 @@ void delete_BST(BST_Node *root)
      * Implement this function
      ****/
 
+    if(root == NULL) return;
+
+    BST_postOrder(root -> left);
+    BST_postOrder(root -> right);
+    free(root);
 }
 
 void BST_shiftFreq(BST_Node *root, char note_src[5], char note_dst[5])

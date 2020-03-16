@@ -100,6 +100,7 @@ BST_Node *newBST_Node(double freq, int bar, double index)
     new_node -> freq = freq;
     new_node -> bar = bar;
     new_node -> index = index;
+    new_node -> key = (10 * bar) + index;
     new_node -> left = NULL;
     new_node -> right = NULL;
         
@@ -131,10 +132,10 @@ BST_Node *BST_insert(BST_Node *root, BST_Node *new_node)
 
     if(root == NULL)
     {
-        return new_node
+        return new_node;
     }
 
-    if(new_node -> key <= root)
+    if(new_node -> key <= root -> key)
     {
         root -> left = BST_insert(root -> left, new_node);
     }
@@ -162,25 +163,27 @@ BST_Node *BST_search(BST_Node *root, int bar, double index)
      * Implement this function
      ****/
 
+    printf("hello");
+
     if(root == NULL)
     {
         return NULL;
     }
 
-    //fabs((root -> key - ((10 * bar) + index))/root -> key)
+    //fabs((root -> key - ((10 * bar) + index))/root -> key) < 1e-15
 
-    if(root -> key == ((10 * bar) + index))
+    if(fabs((root -> key - ((10 * bar) + index))/root -> key) < 1e-15)
     {
         return root;
     }
 
     if(root -> key <= ((10 * bar) + index))
     {
-        return BST_search(root -> left, name);
+        return BST_search(root -> left, bar, index);
     }
     else
     {
-        return BST_search(root -> right, name)
+        return BST_search(root -> right, bar, index);
     }
 
 }
@@ -225,7 +228,7 @@ BST_Node *BST_delete(BST_Node *root, int bar, double index)
 
     BST_Node *tmp;
 
-    if(root == NULL) return NULL;
+    if(root == NULL) return root;
 
     if(root -> key == (10 * bar) + index)
     {
@@ -239,17 +242,21 @@ BST_Node *BST_delete(BST_Node *root, int bar, double index)
         {
             tmp = root -> left;
             free(root);
-            return temp;
+            return tmp;
         }
         else if(root -> left == NULL)
         {
-            temp = root -> right;
+            tmp = root -> right;
             free(root);
             return tmp;
         }
         else
         {
-            
+            BST_Node *temp = find_successor(root);
+            root -> key = temp -> key;
+            root -> bar = temp -> bar;
+            root -> index = temp -> index;
+            root -> right = BST_delete(root -> right, temp -> bar, temp -> index);
             return root;
         }
     }
@@ -325,10 +332,9 @@ void BST_inOrder(BST_Node *root, int depth)
 
     if(root == NULL) return;
 
-    BST_inOrder(root -> left);
-    depth++;
-    printf("depth=%d, Bar:Index (%d:%f), F=%f" = depth, root -> bar, root -> index, root -> freq);
-    BST_inOrder(root -> right);
+    BST_inOrder(root -> left, depth++);
+    printf("depth=%d, Bar:Index (%d:%f), F=%f", depth, root -> bar, root -> index, root -> freq);
+    BST_inOrder(root -> right, depth++);
 
 } 
 
@@ -358,10 +364,9 @@ void BST_preOrder(BST_Node *root, int depth)
     {
         return;
     }
-    depth++;
-    printf("depth=%d, Bar:Index (%d:%f), F=%f" = depth, root -> bar, root -> index, root -> freq);
-    BST_preOrder(root -> left);
-    BST_preOrder(root -> right);
+    printf("depth=%d, Bar:Index (%d:%f), F=%f", depth, root -> bar, root -> index, root -> freq);
+    BST_preOrder(root -> left, depth++);
+    BST_preOrder(root -> right, depth++);
 
 
 
@@ -394,10 +399,9 @@ void BST_postOrder(BST_Node *root,int depth)
 
     if(root == NULL) return;
 
-    BST_postOrder(root -> left);
-    BST_postOrder(root -> right);
-    depth++;
-    printf("depth=%d, Bar:Index (%d:%f), F=%f" = depth, root -> bar, root -> index, root -> freq);
+    BST_postOrder(root -> left, depth++);
+    BST_postOrder(root -> right, depth++);
+    printf("depth=%d, Bar:Index (%d:%f), F=%f", depth, root -> bar, root -> index, root -> freq);
 
 } 
 
@@ -415,8 +419,8 @@ void delete_BST(BST_Node *root)
 
     if(root == NULL) return;
 
-    BST_postOrder(root -> left);
-    BST_postOrder(root -> right);
+    delete_BST(root -> left);
+    delete_BST(root -> right);
     free(root);
 }
 

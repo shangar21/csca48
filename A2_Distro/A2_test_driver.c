@@ -92,13 +92,16 @@ int main()
     else printf("Passed test #2\n");
     
     // Test #3 - Search for specific nodes
+	printf("hello");
     new_note=newBST_Node(110.0,2,.15);
     root=BST_insert(root,new_note);
     new_note=newBST_Node(55.0,1,.75);
     root=BST_insert(root,new_note);
     new_note=newBST_Node(330.0,1,.95);
     root=BST_insert(root,new_note);
+    printf("hello");
     t=BST_search(root,1,.95);
+    printf("we have probrem");
     pass=1;
     if (t==NULL) pass=0;
     if (t->freq!=330.0) pass=0;

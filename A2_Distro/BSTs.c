@@ -249,6 +249,7 @@ BST_Node *BST_delete(BST_Node *root, int bar, double index)
         }
         else
         {
+            
             return root;
         }
     }

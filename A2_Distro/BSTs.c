@@ -135,13 +135,18 @@ BST_Node *BST_insert(BST_Node *root, BST_Node *new_node)
         return new_node;
     }
 
-    if(new_node -> key <= root -> key)
+    if(new_node -> key < root -> key)
     {
         root -> left = BST_insert(root -> left, new_node);
     }
-    else
+    else if (new_node -> key > root -> key)
     {
         root -> right = BST_insert(root -> right, new_node);
+    }
+    else if (root -> bar == new_node -> bar && root -> index == new_node -> index)
+    {
+    	printf("Duplicate node requested (bar:index)=%d,%lf, it was ignored\n", root -> bar, root -> index);
+    	return root;
     }
 
     return root;
@@ -163,8 +168,6 @@ BST_Node *BST_search(BST_Node *root, int bar, double index)
      * Implement this function
      ****/
 
-    printf("hello");
-
     if(root == NULL)
     {
         return NULL;
@@ -172,12 +175,12 @@ BST_Node *BST_search(BST_Node *root, int bar, double index)
 
     //fabs((root -> key - ((10 * bar) + index))/root -> key) < 1e-15
 
-    if(fabs((root -> key - ((10 * bar) + index))/root -> key) < 1e-15)
+    if(root -> bar == bar && root -> index == index)
     {
         return root;
     }
 
-    if(root -> key <= ((10 * bar) + index))
+    if(root -> key > ((10 * bar) + index))
     {
         return BST_search(root -> left, bar, index);
     }
@@ -230,7 +233,7 @@ BST_Node *BST_delete(BST_Node *root, int bar, double index)
 
     if(root == NULL) return root;
 
-    if(root -> key == (10 * bar) + index)
+    if(root -> bar == bar && root -> index == index)
     {
         if(root -> left == NULL && root -> right == NULL)
         {
@@ -252,16 +255,17 @@ BST_Node *BST_delete(BST_Node *root, int bar, double index)
         }
         else
         {
-            BST_Node *temp = find_successor(root);
+            BST_Node *temp = find_successor(root -> right);
             root -> key = temp -> key;
             root -> bar = temp -> bar;
             root -> index = temp -> index;
+            root -> freq = temp -> freq;
             root -> right = BST_delete(root -> right, temp -> bar, temp -> index);
             return root;
         }
     }
 
-    if(root -> key <= ((10 * bar) + index))
+    if(root -> key > ((10 * bar) + index))
     {
         root -> left = BST_delete(root -> left, bar, index);
     }
@@ -273,7 +277,43 @@ BST_Node *BST_delete(BST_Node *root, int bar, double index)
 
 
 
-    return NULL;
+    return root;
+
+/*    BST_Node *temp = NULL;
+    BST_Node *want_to_delete = BST_search(root, bar, index);
+
+    if(want_to_delete != NULL)
+    {
+    	if(want_to_delete -> left == NULL && want_to_delete -> right == NULL)
+    	{
+    		free(want_to_delete);
+    		return NULL;
+    	}
+    	else if(want_to_delete -> left == NULL)
+    	{
+    		temp = want_to_delete -> right;
+    		free(want_to_delete);
+    		return temp;
+    	}
+    	else if(want_to_delete -> right == NULL)
+    	{
+    		temp = want_to_delete -> left;
+    		free(want_to_delete);
+    		return temp;
+    	}
+    	else
+    	{
+    		temp = find_successor(want_to_delete -> right);
+    		want_to_delete -> key = temp -> key;
+    		want_to_delete -> bar = temp -> bar;
+    		want_to_delete -> index = temp -> index;
+    		want_to_delete -> freq = temp -> freq;
+    		want_to_delete -> right = BST_delete(want_to_delete -> right, temp -> bar, temp -> index);
+    		return want_to_delete;
+    	}
+    }
+
+    return root;*/
 }
 
 void BST_makePlayList(BST_Node *root)
@@ -304,6 +344,13 @@ void BST_makePlayList(BST_Node *root)
      * Implement this function
      ****/
 
+	if(root == NULL) return;
+	BST_makePlayList(root -> left);
+	playlist_head = playlist_insert(playlist_head, root -> freq, root -> bar, root -> index);
+	BST_makePlayList(root -> right);
+
+
+
 }
 
 void BST_inOrder(BST_Node *root, int depth)
@@ -333,7 +380,7 @@ void BST_inOrder(BST_Node *root, int depth)
     if(root == NULL) return;
 
     BST_inOrder(root -> left, depth++);
-    printf("depth=%d, Bar:Index (%d:%f), F=%f", depth, root -> bar, root -> index, root -> freq);
+    printf("depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
     BST_inOrder(root -> right, depth++);
 
 } 
@@ -364,7 +411,7 @@ void BST_preOrder(BST_Node *root, int depth)
     {
         return;
     }
-    printf("depth=%d, Bar:Index (%d:%f), F=%f", depth, root -> bar, root -> index, root -> freq);
+    printf("depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
     BST_preOrder(root -> left, depth++);
     BST_preOrder(root -> right, depth++);
 
@@ -401,7 +448,7 @@ void BST_postOrder(BST_Node *root,int depth)
 
     BST_postOrder(root -> left, depth++);
     BST_postOrder(root -> right, depth++);
-    printf("depth=%d, Bar:Index (%d:%f), F=%f", depth, root -> bar, root -> index, root -> freq);
+    printf("depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
 
 } 
 
@@ -423,6 +470,7 @@ void delete_BST(BST_Node *root)
     delete_BST(root -> right);
     free(root);
 }
+
 
 void BST_shiftFreq(BST_Node *root, char note_src[5], char note_dst[5])
 {
@@ -469,13 +517,65 @@ void BST_shiftFreq(BST_Node *root, char note_src[5], char note_dst[5])
     /*** TO DO:
      * Implement this function! (Crunchy!)
      ****/
+	int src_freq = -1;
+	int dest_freq = -1;
+
+	for(int i = 0; i < 100; i++)
+	{
+		if(strcmp(note_src, note_names[i]) == 0)
+		{
+			src_freq = note_freq[i];
+		}
+		else if(strcmp(note_dst, note_names[i]) == 0)
+		{
+			dest_freq = note_freq[i];
+		}
+	}
+
+	if(src_freq != -1 && dest_freq != -1)
+	{
+		BST_makePlayList(root);
+		
+		for(note *current = playlist_head; current -> next != NULL; current = current -> next)
+		{
+			if(current -> freq == src_freq)
+			{
+				BST_Node *need_to_change = BST_search(root, current -> bar, current -> index);
+
+				if(need_to_change != NULL)
+				{
+					need_to_change -> freq = dest_freq;
+				}
+			}
+		}
+	}
 
 }
+
+
+
 
 /********************************************************************************************
  *      Add any helper functions you need for implementing BST_harmonize() just below this
  * comment block, and aboce BST_Harmonize itself!
  * ******************************************************************************************/
+
+int new_freq(note *temp, int semitones)
+{
+
+	for(int i = 0; i < 100; i++)
+	{
+		if(temp -> freq == note_freq[i])
+		{
+			if(i + semitones >= 0 && i + semitones <= 99)
+			{
+				return (note_freq[i + semitones]);
+			}
+		}
+	}
+
+	return temp -> freq;
+}
 
 BST_Node *BST_harmonize(BST_Node *root, int semitones, double time_shift)
 {
@@ -550,7 +650,15 @@ BST_Node *BST_harmonize(BST_Node *root, int semitones, double time_shift)
     /*** TO DO:
      * Implement this function
      ****/
+
+	BST_makePlayList(root);
+
+	for(note *current = playlist_head; current != NULL; current = current -> next)
+	{
+		BST_Node *new_harmony = newBST_Node(new_freq(current, semitones), current -> bar, current -> index + time_shift);
+		root = new_harmony != NULL ? BST_insert(root, new_harmony) : root;
+	}
     
-    return NULL;
+    return root;
 
 }

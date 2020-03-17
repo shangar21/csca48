@@ -656,7 +656,7 @@ BST_Node *BST_harmonize(BST_Node *root, int semitones, double time_shift)
 	for(note *current = playlist_head; current != NULL; current = current -> next)
 	{
 		BST_Node *new_harmony = newBST_Node(new_freq(current, semitones), current -> bar, current -> index + time_shift);
-		root = new_harmony != NULL ? BST_insert(root, new_harmony) : root;
+		root = new_harmony = BST_insert(root, new_harmony);
 	}
     
     return root;

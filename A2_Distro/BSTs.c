@@ -376,12 +376,12 @@ void BST_inOrder(BST_Node *root, int depth)
      * Implement this function
      ****/
 
-
     if(root == NULL) return;
 
-    BST_inOrder(root -> left, depth++);
+    BST_inOrder(root -> left, depth+1);
+    depth++;
     printf("depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
-    BST_inOrder(root -> right, depth++);
+    BST_inOrder(root -> right, depth+1);
 
 } 
 
@@ -407,13 +407,16 @@ void BST_preOrder(BST_Node *root, int depth)
     /*** TO DO:
      * Implement this function
      ****/
+
+    depth = 0;
+
     if(root == NULL)
     {
         return;
     }
     printf("depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
-    BST_preOrder(root -> left, depth++);
-    BST_preOrder(root -> right, depth++);
+    BST_preOrder(root -> left, depth+1);
+    BST_preOrder(root -> right, depth+1);
 
 
 
@@ -446,8 +449,8 @@ void BST_postOrder(BST_Node *root,int depth)
 
     if(root == NULL) return;
 
-    BST_postOrder(root -> left, depth++);
-    BST_postOrder(root -> right, depth++);
+    BST_postOrder(root -> left, depth+1);
+    BST_postOrder(root -> right, depth+1);
     printf("depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
 
 } 
@@ -550,6 +553,9 @@ void BST_shiftFreq(BST_Node *root, char note_src[5], char note_dst[5])
 		}
 	}
 
+    delete_playlist(playlist_head);
+    playlist_head = NULL;
+
 }
 
 
@@ -560,12 +566,12 @@ void BST_shiftFreq(BST_Node *root, char note_src[5], char note_dst[5])
  * comment block, and aboce BST_Harmonize itself!
  * ******************************************************************************************/
 
-int new_freq(note *temp, int semitones)
+double new_freq(note *temp, int semitones)
 {
 
 	for(int i = 0; i < 100; i++)
 	{
-		if(temp -> freq == note_freq[i])
+		if(fabs(temp -> freq - note_freq[i]) <1e-15)
 		{
 			if(i + semitones >= 0 && i + semitones <= 99)
 			{
@@ -574,8 +580,27 @@ int new_freq(note *temp, int semitones)
 		}
 	}
 
-	return temp -> freq;
+	return -1;
 }
+
+double new_index(BST_Node *root, note *temp, double time_shift)
+{
+    if(temp -> index + time_shift > 0 && temp -> index + time_shift < 1)
+    {
+        if(BST_search(root, temp -> bar, temp -> index + time_shift) != NULL)
+        {
+            if(time_shift < 0)
+            {
+                return temp -> index + time_shift - 0.01;    
+            }
+            return temp -> index + time_shift + 0.01;
+        }
+
+        return temp -> index + time_shift;
+    }
+
+    return -1;
+} 
 
 BST_Node *BST_harmonize(BST_Node *root, int semitones, double time_shift)
 {
@@ -655,9 +680,17 @@ BST_Node *BST_harmonize(BST_Node *root, int semitones, double time_shift)
 
 	for(note *current = playlist_head; current != NULL; current = current -> next)
 	{
-		BST_Node *new_harmony = newBST_Node(new_freq(current, semitones), current -> bar, current -> index + time_shift);
-		root = new_harmony = BST_insert(root, new_harmony);
+        if(new_freq(current, semitones) != -1 && new_index(root, current, time_shift) != -1)
+        {
+            BST_Node *nod = NULL;
+            nod = newBST_Node(new_freq(current, semitones), current -> bar, new_index(root, current, time_shift));
+            root = BST_insert(root, nod);
+        }
+
 	}
+
+    delete_playlist(playlist_head);
+    playlist_head = NULL;
     
     return root;
 

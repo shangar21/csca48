@@ -89,17 +89,19 @@ int main()
       printf("Failed test #2 - BST insert didn't work properly\n");
       return 0;
     }
-    else{
-        printf("Passed test #2\n");
-    }
+    else printf("Passed test #2\n");
+    
     // Test #3 - Search for specific nodes
+	printf("hello");
     new_note=newBST_Node(110.0,2,.15);
     root=BST_insert(root,new_note);
     new_note=newBST_Node(55.0,1,.75);
     root=BST_insert(root,new_note);
     new_note=newBST_Node(330.0,1,.95);
     root=BST_insert(root,new_note);
+    printf("hello");
     t=BST_search(root,1,.95);
+    printf("we have probrem");
     pass=1;
     if (t==NULL) pass=0;
     if (t->freq!=330.0) pass=0;
@@ -111,7 +113,6 @@ int main()
     else printf("Passed test #3\n");
     
     // Test #4 - Delete, case a) (node without children)
-
     root=BST_delete(root,1,.95);
     t=BST_search(root,1,.95);
     pass=1;

@@ -379,7 +379,6 @@ void BST_inOrder(BST_Node *root, int depth)
     if(root == NULL) return;
 
     BST_inOrder(root -> left, depth+1);
-    depth++;
     printf("depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
     BST_inOrder(root -> right, depth+1);
 
@@ -589,6 +588,10 @@ double new_index(BST_Node *root, note *temp, double time_shift)
     {
         if(BST_search(root, temp -> bar, temp -> index + time_shift) != NULL)
         {
+            if(time_shift < 0)
+            {
+                return temp -> index + time_shift - 0.01;    
+            }
             return temp -> index + time_shift + 0.01;
         }
 

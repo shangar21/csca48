@@ -379,7 +379,7 @@ void BST_inOrder(BST_Node *root, int depth)
     if(root == NULL) return;
 
     BST_inOrder(root -> left, depth+1);
-    printf("depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
+    printf("Depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
     BST_inOrder(root -> right, depth+1);
 
 } 
@@ -407,13 +407,11 @@ void BST_preOrder(BST_Node *root, int depth)
      * Implement this function
      ****/
 
-    depth = 0;
-
     if(root == NULL)
     {
         return;
     }
-    printf("depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
+    printf("Depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
     BST_preOrder(root -> left, depth+1);
     BST_preOrder(root -> right, depth+1);
 
@@ -450,7 +448,7 @@ void BST_postOrder(BST_Node *root,int depth)
 
     BST_postOrder(root -> left, depth+1);
     BST_postOrder(root -> right, depth+1);
-    printf("depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
+    printf("Depth=%d, Bar:Index (%d:%f), F=%f Hz\n", depth, root -> bar, root -> index, root -> freq);
 
 } 
 
@@ -521,6 +519,9 @@ void BST_shiftFreq(BST_Node *root, char note_src[5], char note_dst[5])
      ****/
 	int src_freq = -1;
 	int dest_freq = -1;
+
+	delete_playlist(playlist_head);
+	playlist_head = NULL;
 
 	for(int i = 0; i < 100; i++)
 	{
@@ -674,7 +675,8 @@ BST_Node *BST_harmonize(BST_Node *root, int semitones, double time_shift)
     /*** TO DO:
      * Implement this function
      ****/
-
+	delete_playlist(playlist_head);
+	playlist_head = NULL;
 	BST_makePlayList(root);
 
 	for(note *current = playlist_head; current != NULL; current = current -> next)

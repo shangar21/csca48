@@ -193,6 +193,11 @@ void print_ingredients(intNode *h)
      * TO Do:
      * Complete this function
      *****/
+
+	for(intNode *current = h; current != NULL; current = current -> next)
+	{
+		printf("%s\n", ingredients[current -> x]);
+	}
 }
 
 int ingredient_index(char source_ingredient[MAX_STR_LEN])
@@ -212,7 +217,16 @@ int ingredient_index(char source_ingredient[MAX_STR_LEN])
      * TO Do:
      * Implement this function
      *****/
-     return 0;
+
+	for(int i = 0; i < MAT_SIZE; i++)
+	{
+		if(strcmp(ingredients[i], source_ingredient) == 0)
+		{
+			return i;
+		}
+	}
+
+     return -1;
 }
 
 void related_ingredients(char source_ingredient[MAX_STR_LEN])
@@ -241,6 +255,16 @@ void related_ingredients(char source_ingredient[MAX_STR_LEN])
      * TO DO:
      * Implement this function
      * ********/
+
+	int index_source = ingredient_index(source_ingredient);
+
+	for(int i = 0; i < MAT_SIZE; i++)
+	{
+		if(AdjMat[index_source][i] > 0)
+		{
+			printf("%s\n", ingredients[i]);
+		}
+	}
 
 }
 
@@ -294,7 +318,34 @@ intNode *related_k_dist(intNode *h, char source_ingredient[MAX_STR_LEN], int k, 
      * Complete this function
      *******/
 
-    return NULL;
+	int index_source = ingredient_index(source_ingredient);
+
+	if(dist == k)
+	{	
+		for(int i = 0; i < MAT_SIZE; i++)
+		{
+			if(AdjMat[index_source][i] > 0)
+			{
+				h = insertInt(h, i);
+			}
+		}
+
+		return h;
+
+	}	
+
+	for(int i = 0; i < MAT_SIZE; i++)
+	{
+		if(AdjMat[index_source][i] > 0)
+		{
+			h = insertInt(h, i);
+			related_k_dist(h, ingredients[i], k, dist+1);
+		}
+	}
+
+	return h;
+    
+
 }
 
 intNode *related_with_restrictions(char source_ingredient[MAX_STR_LEN], char avoid[MAX_STR_LEN], int k_source, int k_avoid)

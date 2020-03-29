@@ -194,10 +194,14 @@ void print_ingredients(intNode *h)
      * Complete this function
      *****/
 
-	for(intNode *current = h; current != NULL; current = current -> next)
+	if(h == NULL)
 	{
-		printf("%s\n", ingredients[current -> x]);
+		return;
 	}
+
+	printf("%s\n", ingredients[h->x]);
+	print_ingredients(h -> next);
+
 }
 
 int ingredient_index(char source_ingredient[MAX_STR_LEN])
@@ -318,33 +322,7 @@ intNode *related_k_dist(intNode *h, char source_ingredient[MAX_STR_LEN], int k, 
      * Complete this function
      *******/
 
-	int index_source = ingredient_index(source_ingredient);
-
-	if(dist == k)
-	{	
-		for(int i = 0; i < MAT_SIZE; i++)
-		{
-			if(AdjMat[index_source][i] > 0)
-			{
-				h = insertInt(h, i);
-			}
-		}
-
-		return h;
-
-	}	
-
-	for(int i = 0; i < MAT_SIZE; i++)
-	{
-		if(AdjMat[index_source][i] > 0)
-		{
-			h = insertInt(h, i);
-			related_k_dist(h, ingredients[i], k, dist+1);
-		}
-	}
-
-	return h;
-    
+	
 
 }
 

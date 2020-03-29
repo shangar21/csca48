@@ -1,5 +1,4 @@
-/*
- * CSC A48 - Exercise 11 - Sudoku Solver
+ /* CSC A48 - Exercise 11 - Sudoku Solver
  * 
  * Your goal in this exercise is to practice recursion and
  * to see how a properly written recursive solution can
@@ -101,6 +100,70 @@ void print_sudoku(int sudoku[9][9])
   }
 }
 
+int find_empty(int sudoku[9][9], int *row, int *column)
+{
+	for(*row = 0; *row < 9; (*row)++)
+	{
+		for(*column = 0; *column < 9; (*column)++)
+		{
+			if(sudoku[*row][*column] == 0)
+			{
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
+int used_row(int sudoku[9][9], int row, int num)
+{
+	for(int column = 0; column < 9; column++)
+	{
+		if(sudoku[row][column] == num)
+		{
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+int used_column(int sudoku[9][9], int column, int num)
+{
+	for(int row = 0; row < 9; row++)
+	{
+		if(sudoku[row][column] == num)
+		{
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+int used_grid(int sudoku[9][9], int  s_row, int s_col, int num)
+{
+	for(int row = 0; row < 3; row++)
+	{
+		for(int column = 0; column < 3; column++)
+		{
+			if(sudoku[s_row + row][s_col + column] == num)
+			{
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
+int valid_entry(int sudoku[9][9], int row, int column, int num)
+{
+	return !used_row(sudoku, row, num) && !used_column(sudoku, column, num) && !used_grid(sudoku, row - (row %3), column - (column % 3), num);
+}
+
+
 int check_sudoku(int sudoku[9][9])
 {
   /*
@@ -146,6 +209,32 @@ int solved(int sudoku[9][9])
    return 0;  
 }
 
+
+int solve(int grid[9][9]) {
+	
+	int row = 0;
+	int col = 0;
+	
+	if (!find_empty(grid, &row, &col)){
+		return 1;
+	}
+	
+	for (int num = 1; num <= 9; num++ ) {
+		
+		if (valid_entry(grid, row, col, num)) {
+			grid[row][col] = num;
+			
+			if (solve(grid)) {
+				return 1;
+			}
+			
+			grid[row][col] = 0;
+		}
+	}
+	
+	return 0;
+}
+
 void solve_sudoku(int sudoku[9][9], int depth)
 {
   /*
@@ -169,6 +258,10 @@ void solve_sudoku(int sudoku[9][9], int depth)
    * TO DO:
    * Complete this function
    *****/  
+
+	solve(sudoku);
+
+
 }
 
 #ifndef __testing

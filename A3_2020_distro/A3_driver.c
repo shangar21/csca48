@@ -62,16 +62,18 @@ int main()
    // #define at the top of 'ingredient_graph.c'
    load_ingredients();
    printf("------- The available ingredients should appear above this line -------\n");
+
+   
    // Call related ingredients
    printf("\n ****** Related ingredients for quinoa:\n");
    related_ingredients("quinoa");  // Make sure this
 				   // ingredient exists
-   
+  
    printf("\n ****** Related to 'quinoa' k-dist, k=0\n");
    head=related_k_dist(head,"quinoa",0,0);
    print_ingredients(head);
    head=deleteList(head);
- 
+
    printf("\n ****** Related to 'quinoa' k-dist, k=1\n");
    head=related_k_dist(head,"quinoa",1,0);
    print_ingredients(head);
